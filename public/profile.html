@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Profil — Premium Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-top">
+      <a href="/" class="brand"><span class="brand-icon">P</span> PremiumStore</a>
+      <div class="header-actions">
+        <a href="/" class="btn btn-sm">🏠 Bosh sahifa</a>
+        <a href="/cart.html" class="btn-icon" title="Savatcha">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h12l-1.5 9h-9z"/><path d="M6 6L5 1H1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+          <span class="count" id="cartCount">0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container section">
+    <div class="breadcrumb"><a href="/">Bosh sahifa</a> <span>/</span> <span>Profil</span></div>
+    <div class="dashboard" id="dashboardArea">
+      <aside class="dash-sidebar">
+        <div class="user-info">
+          <div class="avatar" id="avatarLetter">U</div>
+          <div class="user-name" id="userName">—</div>
+          <div class="user-email" id="userEmail">—</div>
+        </div>
+        <nav class="dash-nav">
+          <a href="#" class="active">📦 Buyurtmalar</a>
+          <a href="/admin.html">⚙️ Admin panel</a>
+        </nav>
+      </aside>
+      <div class="dash-content">
+        <h2 style="font-size:20px;margin-bottom:16px">Mening buyurtmalarim</h2>
+        <div id="ordersList"><div class="skeleton" style="height:60px;border-radius:8px;margin-bottom:8px"></div><div class="skeleton" style="height:60px;border-radius:8px"></div></div>
+        <div style="margin-top:24px"><button id="logoutBtn" class="btn-danger btn">Hisobdan chiqish</button></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <footer class="site-footer">
+    <div class="container"><div class="footer-bottom">© 2024 PremiumStore. Barcha huquqlar himoyalangan.</div></div>
+  </footer>
+
+  <script type="module" src="/js/profile.js"></script>
+</body>
+</html>

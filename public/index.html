@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Premium Store — Ultra premium onlayn do'kon</title>
+  <meta name="description" content="Premium Store — eng sifatli mahsulotlar, tez yetkazib berish, maxsus chegirmalar. Uzum.uz uslubida ultra zamonaviy do'kon.">
+  <meta name="theme-color" content="#7c3aed">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/styles.css">
+  <meta property="og:title" content="Premium Store — Ultra premium onlayn do'kon">
+  <meta property="og:description" content="Eng sifatli mahsulotlar, tez yetkazib berish va maxsus chegirmalar.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/images/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Premium Store","url":"/"}</script>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="container">
+    <div class="header-top">
+      <a href="/" class="brand"><span class="brand-icon">P</span> PremiumStore</a>
+      <div class="search-bar">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" placeholder="Mahsulot, kategoriya yoki brendni qidiring..." autocomplete="off">
+      </div>
+      <div class="header-actions">
+        <button class="btn-icon" id="loginBtn" title="Profil">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+        <a href="/cart.html" class="btn-icon" id="cartBtn" title="Savatcha">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="count" id="cartCount">0</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="categories-bar">
+    <div class="container">
+      <div class="categories-list" id="categoriesList">
+        <button class="cat-chip active" data-cat="">Barchasi</button>
+        <button class="cat-chip" data-cat="electronics">📱 Elektronika</button>
+        <button class="cat-chip" data-cat="fashion">👗 Kiyim-kechak</button>
+        <button class="cat-chip" data-cat="home">🏠 Uy-ro'zg'or</button>
+        <button class="cat-chip" data-cat="beauty">💄 Go'zallik</button>
+        <button class="cat-chip" data-cat="sports">⚽ Sport</button>
+        <button class="cat-chip" data-cat="books">📚 Kitoblar</button>
+        <button class="cat-chip" data-cat="kids">🧸 Bolalar uchun</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Hero -->
+  <div class="container">
+    <section class="hero">
+      <h1>Eng yaxshi mahsulotlar — <br>bir joyda!</h1>
+      <p>Minglab mahsulotlar, tez yetkazib berish va ishonchli to'lov. Hoziroq xarid qiling!</p>
+      <button class="btn-primary" onclick="document.getElementById('productsSection').scrollIntoView({behavior:'smooth'})">🛍️ Xarid boshlash</button>
+    </section>
+  </div>
+
+  <!-- Products -->
+  <div class="container section" id="productsSection">
+    <div class="section-header">
+      <h2 class="section-title" id="sectionTitle">Barcha mahsulotlar</h2>
+      <span id="productCount" style="font-size:13px;color:var(--text-muted)"></span>
+    </div>
+    <div class="products-grid" id="productsGrid"></div>
+    <div id="loadMoreWrap" style="text-align:center;padding:24px;display:none">
+      <button class="btn-outline" id="loadMoreBtn">Ko'proq ko'rsatish</button>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Premium Store</h4>
+        <p style="font-size:14px;color:rgba(255,255,255,.5)">Ultra zamonaviy onlayn do'kon. Eng yaxshi narxlar va tez yetkazib berish.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Sahifalar</h4>
+        <a href="/">Bosh sahifa</a>
+        <a href="/cart.html">Savatcha</a>
+        <a href="/profile.html">Profil</a>
+        <a href="/login.html">Kirish</a>
+      </div>
+      <div class="footer-col">
+        <h4>Kategoriyalar</h4>
+        <a href="/?cat=electronics">Elektronika</a>
+        <a href="/?cat=fashion">Kiyim-kechak</a>
+        <a href="/?cat=home">Uy-ro'zg'or</a>
+        <a href="/?cat=beauty">Go'zallik</a>
+      </div>
+      <div class="footer-col">
+        <h4>Bog'lanish</h4>
+        <a href="tel:+998901234567">📞 +998 90 123 45 67</a>
+        <a href="mailto:info@premiumstore.uz">📧 info@premiumstore.uz</a>
+        <a href="#">📍 Toshkent, O'zbekiston</a>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 Premium Store. Barcha huquqlar himoyalangan.</div>
+  </div>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+<script type="module" src="/js/app.js"></script>
+</body>
+</html>

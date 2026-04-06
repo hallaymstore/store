@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ro'yxatdan o'tish — Premium Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-top">
+      <a href="/" class="brand"><span class="brand-icon">P</span> PremiumStore</a>
+    </div>
+  </header>
+
+  <main class="auth-page">
+    <div class="auth-card">
+      <h1>Ro'yxatdan o'tish</h1>
+      <p class="subtitle">Yangi hisob yarating</p>
+      <form id="regForm">
+        <div class="form-group">
+          <label>Foydalanuvchi nomi</label>
+          <input name="username" required placeholder="Username tanlang" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input name="email" type="email" placeholder="email@example.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label>Parol</label>
+          <input name="password" type="password" required placeholder="Kamida 4 belgi" minlength="4" autocomplete="new-password">
+        </div>
+        <button class="btn-primary" type="submit">Ro'yxatdan o'tish</button>
+      </form>
+      <div class="auth-link">Hisobingiz bormi? <a href="/login.html">Kirish</a></div>
+    </div>
+  </main>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script type="module" src="/js/register.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "premium-store",
+  "version": "1.0.0",
+  "description": "Ultra premium responsive e-commerce prototype",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.32.0",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "helmet": "^6.2.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^6.10.0",
+    "multer": "^1.4.5-lts.1",
+    "streamifier": "^0.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
