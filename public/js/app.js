@@ -1,4 +1,4 @@
-/* ========== Premium Store — Main App ========== */
+/* ========== HALLAYM Store — Main App ========== */
 
 // --- Helpers ---
 function getCart() { return JSON.parse(localStorage.getItem('premium_cart') || '[]'); }
@@ -6,6 +6,8 @@ function saveCart(cart) { localStorage.setItem('premium_cart', JSON.stringify(ca
 function updateCartCount() {
   const c = getCart().reduce((s, i) => s + (i.qty || 1), 0);
   document.querySelectorAll('#cartCount').forEach(el => el.textContent = c);
+  const mb = document.getElementById('mobileCartCount');
+  if (mb) { mb.textContent = c; mb.style.display = c > 0 ? 'flex' : 'none'; }
 }
 function showToast(msg, type = 'success') {
   const tc = document.getElementById('toastContainer');
@@ -32,7 +34,7 @@ function addToCart(product, qty = 1) {
   if (idx === -1) cart.push({ ...product, qty });
   else cart[idx].qty += qty;
   saveCart(cart);
-  showToast('Savatchaga qo\'shildi ✓');
+  showToast('Savatchaga qo\'shildi');
 }
 
 // --- State ---
@@ -72,7 +74,7 @@ function createProductCard(p) {
       </div>
     </div>
     <div class="card-actions">
-      <button class="add-cart-btn">🛒 Savatchaga</button>
+      <button class="add-cart-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg> Savatchaga</button>
     </div>
   `;
   card.querySelector('.add-cart-btn').addEventListener('click', (e) => { e.preventDefault(); addToCart(p); });
@@ -84,7 +86,7 @@ function renderProducts(products, append = false) {
   if (!grid) return;
   if (!append) grid.innerHTML = '';
   if (!products.length && !append) {
-    grid.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><h3>Mahsulot topilmadi</h3><p>Boshqa kalit so\'z bilan qidirib ko\'ring</p></div>';
+    grid.innerHTML = '<div class="empty-state"><div class="icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div><h3>Mahsulot topilmadi</h3><p>Boshqa kalit so\'z bilan qidirib ko\'ring</p></div>';
     return;
   }
   products.forEach(p => grid.appendChild(createProductCard(p)));
@@ -115,7 +117,7 @@ async function loadProducts(q = '', cat = '', page = 1, append = false) {
     if (wrap) wrap.style.display = (currentPage * LIMIT < totalProducts) ? 'block' : 'none';
   } catch (err) {
     console.error('Mahsulotlarni yuklashda xatolik:', err);
-    if (grid) grid.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><h3>Xatolik yuz berdi</h3><p>Sahifani qaytadan yuklang</p></div>';
+    if (grid) grid.innerHTML = '<div class="empty-state"><div class="icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h3>Xatolik yuz berdi</h3><p>Sahifani qaytadan yuklang</p></div>';
   }
 }
 
@@ -178,6 +180,15 @@ document.addEventListener('DOMContentLoaded', () => {
     heroBtn.addEventListener('click', () => {
       const sec = document.getElementById('productsSection');
       if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+
+  // Mobile profile button
+  const mobileProfileBtn = document.getElementById('mobileProfileBtn');
+  if (mobileProfileBtn) {
+    mobileProfileBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      location.href = localStorage.getItem('token') ? '/profile.html' : '/login.html';
     });
   }
 });

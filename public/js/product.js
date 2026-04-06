@@ -20,21 +20,21 @@ function addToCart(product, qty = 1) {
   const idx = cart.findIndex(c => (c._id || c.id) === pid);
   if (idx === -1) cart.push({ ...product, qty }); else cart[idx].qty += qty;
   saveCart(cart); updateCartCount();
-  showToast('Savatchaga qo\'shildi ✓');
+  showToast('Savatchaga qo\'shildi');
 }
 
 async function load() {
-  if (!id) { container.innerHTML = '<div class="empty-state"><div class="icon">❌</div><h3>Mahsulot topilmadi</h3></div>'; return; }
+  if (!id) { container.innerHTML = '<div class="empty-state"><div class="icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><h3>Mahsulot topilmadi</h3></div>'; return; }
   // Skeleton
   container.innerHTML = '<div class="product-detail"><div class="skeleton" style="aspect-ratio:1;border-radius:12px"></div><div style="display:flex;flex-direction:column;gap:16px"><div class="skeleton" style="height:32px;width:80%;border-radius:8px"></div><div class="skeleton" style="height:20px;width:40%;border-radius:8px"></div><div class="skeleton" style="height:36px;width:50%;border-radius:8px"></div></div></div>';
 
   const res = await fetch('/api/products/' + encodeURIComponent(id));
-  if (!res.ok) { container.innerHTML = '<div class="empty-state"><div class="icon">❌</div><h3>Mahsulot topilmadi</h3><a href="/" class="btn-primary" style="display:inline-flex;margin-top:12px">Bosh sahifaga</a></div>'; return; }
+  if (!res.ok) { container.innerHTML = '<div class="empty-state"><div class="icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><h3>Mahsulot topilmadi</h3><a href="/" class="btn-primary" style="display:inline-flex;margin-top:12px">Bosh sahifaga</a></div>'; return; }
   const p = await res.json();
 
   // SEO
   try {
-    document.title = `${p.title} — Premium Store`;
+    document.title = `${p.title} — HALLAYM Store`;
     const setMeta = (sel, attr, val) => { let el = document.querySelector(sel); if (el) el[attr] = val; };
     setMeta('meta[name="description"]', 'content', (p.description || '').substring(0, 160));
     setMeta('meta[property="og:title"]', 'content', p.title);
@@ -78,8 +78,8 @@ function render(p) {
           <button id="qtyPlus">+</button>
         </div>
         <div class="detail-actions">
-          <button id="addCartBtn" class="btn-primary">🛒 Savatchaga qo'shish</button>
-          <button id="buyNowBtn" class="btn-outline">⚡ Hozir sotib olish</button>
+          <button id="addCartBtn" class="btn-primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg> Savatchaga qo'shish</button>
+          <button id="buyNowBtn" class="btn-outline"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Hozir sotib olish</button>
         </div>
       </div>
     </div>`;

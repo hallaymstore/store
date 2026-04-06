@@ -13,7 +13,7 @@ function renderCart() {
   const area = document.getElementById('cartArea');
   const cart = getCart();
   if (!cart.length) {
-    area.innerHTML = '<div class="empty-state"><div class="icon">🛒</div><h3>Savatcha bo\'sh</h3><p>Mahsulotlar qo\'shish uchun bosh sahifaga o\'ting</p><a href="/" class="btn-primary" style="display:inline-flex;margin-top:16px">Xarid qilish</a></div>';
+    area.innerHTML = '<div class="empty-state"><div class="icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></div><h3>Savatcha bo\'sh</h3><p>Mahsulotlar qo\'shish uchun bosh sahifaga o\'ting</p><a href="/" class="btn-primary" style="display:inline-flex;margin-top:16px">Xarid qilish</a></div>';
     return;
   }
   const total = cart.reduce((s, i) => s + (i.qty || 1) * (i.price || 0), 0);
@@ -33,7 +33,7 @@ function renderCart() {
         <button data-idx="${idx}" data-dir="1" class="qty-change">+</button>
       </div>
       <div style="font-weight:700;min-width:100px;text-align:right">${formatPrice((it.qty || 1) * (it.price || 0))}</div>
-      <button data-idx="${idx}" class="remove-btn btn-ghost" title="O'chirish">✕</button>
+      <button data-idx="${idx}" class="remove-btn btn-ghost" title="O'chirish"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>`;
   }).join('');
 

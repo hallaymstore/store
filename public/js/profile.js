@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (oRes.ok) {
       const orders = await oRes.json();
       if (!orders.length) {
-        ordersList.innerHTML = '<div class="empty-state"><div class="icon">📦</div><h3>Buyurtmalar yo\'q</h3><p>Hali buyurtma bermadingiz</p><a href="/" class="btn-primary" style="display:inline-flex;margin-top:12px">Xarid qilish</a></div>';
+        ordersList.innerHTML = '<div class="empty-state"><div class="icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0022 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><h3>Buyurtmalar yo\'q</h3><p>Hali buyurtma bermadingiz</p><a href="/" class="btn-primary" style="display:inline-flex;margin-top:12px">Xarid qilish</a></div>';
       } else {
         const statusMap = { pending: ['Kutilmoqda', 'badge-accent'], processing: ['Jarayonda', 'badge-accent'], delivered: ['Yetkazildi', 'badge-green'], cancelled: ['Bekor qilindi', 'badge-red'] };
         ordersList.innerHTML = `<table class="admin-table"><thead><tr><th>Buyurtma</th><th>Mahsulotlar</th><th>Jami</th><th>Holat</th></tr></thead><tbody>${orders.map(o => {
