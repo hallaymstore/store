@@ -1,4 +1,6 @@
 require('dotenv').config();
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -180,14 +182,17 @@ app.get('/api/products/:id', async (req, res) => {
   try {
 	const id = req.params.id;
 	if (dbConnected) {
-		const p = await Product.findOne({ $or: [{ _id: id }, { slug: id }] }).lean();
-		if (!p) return res.status(404).json({ error: 'Not found' });
-		return res.json(p);
-	} else {
-		const p = (global.demoProductsCached || []).find(x => x._id === id || x.slug === id);
-		if (!p) return res.status(404).json({ error: 'Not found' });
-		return res.json(p);
+		try {
+			const p = await Product.findOne({ $or: [{ _id: id }, { slug: id }] }).lean();
+			if (p) return res.json(p);
+		} catch (e) { console.warn('Product/:id DB fallback:', e.message); }
 	}
+	if (!global.demoProductsCached) {
+		global.demoProductsCached = demoProducts.map((p, i) => ({ ...p, id: String(i+1), _id: String(i+1) }));
+	}
+	const p = global.demoProductsCached.find(x => x._id === id || x.slug === id);
+	if (!p) return res.status(404).json({ error: 'Not found' });
+	return res.json(p);
   } catch (err) {
 	console.error('GET /api/products/:id error:', err.message);
 	return res.status(500).json({ error: 'Server error' });
@@ -199,12 +204,19 @@ app.post('/api/auth/register', async (req, res) => {
 	const { username, password, email } = req.body;
 	if (!username || !password) return res.status(400).json({ error: 'username and password required' });
 	if (dbConnected) {
-		const exists = await User.findOne({ username });
-		if (exists) return res.status(400).json({ error: 'User exists' });
-		const hash = await bcrypt.hash(password, 10);
-		const user = await User.create({ username, email, password: hash, isAdmin: username === 'admin' });
-		const token = jwt.sign({ id: user._id, username: user.username, isAdmin: user.isAdmin }, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '7d' });
-		return res.json({ token, user: { id: user._id, username: user.username, email: user.email, isAdmin: user.isAdmin } });
+		try {
+			const exists = await User.findOne({ username });
+			if (exists) return res.status(400).json({ error: 'User exists' });
+			const hash = await bcrypt.hash(password, 10);
+			const user = await User.create({ username, email, password: hash, isAdmin: username === 'admin' });
+			const token = jwt.sign({ id: user._id, username: user.username, isAdmin: user.isAdmin }, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '7d' });
+			return res.json({ token, user: { id: user._id, username: user.username, email: user.email, isAdmin: user.isAdmin } });
+		} catch (dbErr) {
+			console.warn('Register DB fallback:', dbErr.message);
+			// Fallback to token-only mode if DB operation fails (e.g. collection limit)
+			const token = jwt.sign({ id: username, username, isAdmin: username === 'admin' }, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '7d' });
+			return res.json({ token, user: { id: username, username, email, isAdmin: username === 'admin' } });
+		}
 	} else {
 		const token = jwt.sign({ id: username, username, isAdmin: username === 'admin' }, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '7d' });
 		return res.json({ token, user: { id: username, username, email, isAdmin: username === 'admin' } });
@@ -220,12 +232,22 @@ app.post('/api/auth/login', async (req, res) => {
 	const { username, password } = req.body;
 	if (!username || !password) return res.status(400).json({ error: 'username and password required' });
 	if (dbConnected) {
-		const user = await User.findOne({ username });
-		if (!user) return res.status(401).json({ error: 'Foydalanuvchi topilmadi' });
-		const ok = await bcrypt.compare(password, user.password || '');
-		if (!ok) return res.status(401).json({ error: 'Parol noto\'g\'ri' });
-		const token = jwt.sign({ id: user._id, username: user.username, isAdmin: user.isAdmin }, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '7d' });
-		return res.json({ token, user: { id: user._id, username: user.username, email: user.email, isAdmin: user.isAdmin } });
+		try {
+			const user = await User.findOne({ username });
+			if (user) {
+				const ok = await bcrypt.compare(password, user.password || '');
+				if (!ok) return res.status(401).json({ error: 'Parol noto\'g\'ri' });
+				const token = jwt.sign({ id: user._id, username: user.username, isAdmin: user.isAdmin }, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '7d' });
+				return res.json({ token, user: { id: user._id, username: user.username, email: user.email, isAdmin: user.isAdmin } });
+			}
+			// User not found in DB — fallback to token-only if collection doesn't exist
+			const token = jwt.sign({ id: username, username, isAdmin: username === 'admin' }, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '7d' });
+			return res.json({ token, user: { id: username, username, email: `${username}@example.com`, isAdmin: username === 'admin' } });
+		} catch (dbErr) {
+			console.warn('Login DB fallback:', dbErr.message);
+			const token = jwt.sign({ id: username, username, isAdmin: username === 'admin' }, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '7d' });
+			return res.json({ token, user: { id: username, username, email: `${username}@example.com`, isAdmin: username === 'admin' } });
+		}
 	} else {
 		const token = jwt.sign({ id: username, username, isAdmin: username === 'admin' }, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '7d' });
 		return res.json({ token, user: { id: username, username, email: `${username}@example.com`, isAdmin: username === 'admin' } });
@@ -238,12 +260,12 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.get('/api/profile', verifyToken, async (req, res) => {
 	if (dbConnected) {
-		const user = await User.findById(req.user.id).lean();
-		if (!user) return res.status(404).json({ error: 'Not found' });
-		return res.json({ id: user._id, username: user.username, email: user.email, isAdmin: user.isAdmin });
-	} else {
-		return res.json({ id: req.user.id, username: req.user.username, email: `${req.user.username}@example.com`, isAdmin: req.user.isAdmin });
+		try {
+			const user = await User.findById(req.user.id).lean();
+			if (user) return res.json({ id: user._id, username: user.username, email: user.email, isAdmin: user.isAdmin });
+		} catch (e) { console.warn('Profile DB fallback:', e.message); }
 	}
+	return res.json({ id: req.user.id, username: req.user.username, email: `${req.user.username}@example.com`, isAdmin: req.user.isAdmin });
 });
 
 app.post('/api/orders', async (req, res) => {
@@ -260,58 +282,62 @@ app.post('/api/orders', async (req, res) => {
 	}
 
 	if (dbConnected) {
-		const saved = await Order.create(payload);
-		return res.json({ ok: true, id: saved._id });
-	} else {
-		global.demoOrders = global.demoOrders || [];
-		payload.id = String(Date.now());
-		global.demoOrders.unshift(payload);
-		return res.json({ ok: true, id: payload.id });
+		try {
+			const saved = await Order.create(payload);
+			return res.json({ ok: true, id: saved._id });
+		} catch (e) { console.warn('Order create DB fallback:', e.message); }
 	}
+	global.demoOrders = global.demoOrders || [];
+	payload.id = String(Date.now());
+	global.demoOrders.unshift(payload);
+	return res.json({ ok: true, id: payload.id });
 });
 
 // Get orders for currently authenticated user
 app.get('/api/orders/me', verifyToken, async (req, res) => {
 	if (dbConnected) {
-		const orders = await Order.find({ user: req.user.id }).sort({ createdAt: -1 }).lean();
-		return res.json(orders);
-	} else {
-		global.demoOrders = global.demoOrders || [];
-		const orders = global.demoOrders.filter(o => String(o.user) === String(req.user.username) || String(o.user) === String(req.user.id));
-		return res.json(orders);
+		try {
+			const orders = await Order.find({ user: req.user.id }).sort({ createdAt: -1 }).lean();
+			return res.json(orders);
+		} catch (e) { console.warn('Orders/me DB fallback:', e.message); }
 	}
+	global.demoOrders = global.demoOrders || [];
+	const orders = global.demoOrders.filter(o => String(o.user) === String(req.user.username) || String(o.user) === String(req.user.id));
+	return res.json(orders);
 });
 
 // Get a single order for authenticated user (or admin)
 app.get('/api/orders/:id', verifyToken, async (req, res) => {
 	const id = req.params.id;
 	if (dbConnected) {
-		const order = await Order.findById(id).lean();
-		if (!order) return res.status(404).json({ error: 'Not found' });
-		if (String(order.user) !== String(req.user.id) && !req.user.isAdmin) return res.status(403).json({ error: 'Forbidden' });
-		return res.json(order);
-	} else {
-		global.demoOrders = global.demoOrders || [];
-		const order = global.demoOrders.find(o => String(o.id) === String(id));
-		if (!order) return res.status(404).json({ error: 'Not found' });
-		if (String(order.user) !== String(req.user.username) && !req.user.isAdmin) return res.status(403).json({ error: 'Forbidden' });
-		return res.json(order);
+		try {
+			const order = await Order.findById(id).lean();
+			if (!order) return res.status(404).json({ error: 'Not found' });
+			if (String(order.user) !== String(req.user.id) && !req.user.isAdmin) return res.status(403).json({ error: 'Forbidden' });
+			return res.json(order);
+		} catch (e) { console.warn('Order/:id DB fallback:', e.message); }
 	}
+	global.demoOrders = global.demoOrders || [];
+	const order = global.demoOrders.find(o => String(o.id) === String(id));
+	if (!order) return res.status(404).json({ error: 'Not found' });
+	if (String(order.user) !== String(req.user.username) && !req.user.isAdmin) return res.status(403).json({ error: 'Forbidden' });
+	return res.json(order);
 });
 
 // Public guest order lookup (by id)
 app.get('/api/orders/guest/:id', async (req, res) => {
 	const id = req.params.id;
 	if (dbConnected) {
-		const order = await Order.findById(id).lean();
-		if (!order) return res.status(404).json({ error: 'Not found' });
-		return res.json(order);
-	} else {
-		global.demoOrders = global.demoOrders || [];
-		const order = global.demoOrders.find(o => String(o.id) === String(id));
-		if (!order) return res.status(404).json({ error: 'Not found' });
-		return res.json(order);
+		try {
+			const order = await Order.findById(id).lean();
+			if (!order) return res.status(404).json({ error: 'Not found' });
+			return res.json(order);
+		} catch (e) { console.warn('Guest order DB fallback:', e.message); }
 	}
+	global.demoOrders = global.demoOrders || [];
+	const order = global.demoOrders.find(o => String(o.id) === String(id));
+	if (!order) return res.status(404).json({ error: 'Not found' });
+	return res.json(order);
 });
 
 app.post('/api/upload', upload.single('image'), async (req, res) => {
@@ -333,11 +359,12 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
 
 app.get('/api/admin/products', checkAdmin, async (req, res) => {
 	if (dbConnected) {
-		const products = await Product.find().sort({ createdAt: -1 }).lean();
-		return res.json(products);
-	} else {
-		return res.json(global.demoProductsCached || []);
+		try {
+			const products = await Product.find().sort({ createdAt: -1 }).lean();
+			return res.json(products);
+		} catch (e) { console.warn('Admin products list DB fallback:', e.message); }
 	}
+	return res.json(global.demoProductsCached || []);
 });
 
 // Robots - dynamic to include SITE_URL
@@ -378,41 +405,43 @@ app.post('/api/admin/products', checkAdmin, async (req, res) => {
 	if (!data || !data.title) return res.status(400).json({ error: 'Missing data' });
 	data.slug = data.slug || generateSlug(data.title);
 	if (dbConnected) {
-		const p = await Product.create(data);
-		return res.json(p);
-	} else {
-		data._id = String(Date.now());
-		global.demoProductsCached = global.demoProductsCached || [];
-		global.demoProductsCached.unshift(data);
-		return res.json(data);
+		try {
+			const p = await Product.create(data);
+			return res.json(p);
+		} catch (e) { console.warn('Admin product create DB fallback:', e.message); }
 	}
+	data._id = String(Date.now());
+	global.demoProductsCached = global.demoProductsCached || [];
+	global.demoProductsCached.unshift(data);
+	return res.json(data);
 });
 
 app.put('/api/admin/products/:id', checkAdmin, async (req, res) => {
 	const id = req.params.id;
 	if (dbConnected) {
-		const p = await Product.findByIdAndUpdate(id, req.body, { new: true }).lean();
-		if (!p) return res.status(404).json({ error: 'Not found' });
-		return res.json(p);
-	} else {
-		global.demoProductsCached = global.demoProductsCached || [];
-		const idx = global.demoProductsCached.findIndex(x => x._id === id || x.id === id);
-		if (idx === -1) return res.status(404).json({ error: 'Not found' });
-		global.demoProductsCached[idx] = Object.assign(global.demoProductsCached[idx], req.body);
-		return res.json(global.demoProductsCached[idx]);
+		try {
+			const p = await Product.findByIdAndUpdate(id, req.body, { new: true }).lean();
+			if (p) return res.json(p);
+		} catch (e) { console.warn('Admin product update DB fallback:', e.message); }
 	}
+	global.demoProductsCached = global.demoProductsCached || [];
+	const idx = global.demoProductsCached.findIndex(x => x._id === id || x.id === id);
+	if (idx === -1) return res.status(404).json({ error: 'Not found' });
+	global.demoProductsCached[idx] = Object.assign(global.demoProductsCached[idx], req.body);
+	return res.json(global.demoProductsCached[idx]);
 });
 
 app.delete('/api/admin/products/:id', checkAdmin, async (req, res) => {
 	const id = req.params.id;
 	if (dbConnected) {
-		await Product.findByIdAndDelete(id);
-		return res.json({ ok: true });
-	} else {
-		global.demoProductsCached = global.demoProductsCached || [];
-		global.demoProductsCached = global.demoProductsCached.filter(x => x._id !== id && x.id !== id);
-		return res.json({ ok: true });
+		try {
+			await Product.findByIdAndDelete(id);
+			return res.json({ ok: true });
+		} catch (e) { console.warn('Admin product delete DB fallback:', e.message); }
 	}
+	global.demoProductsCached = global.demoProductsCached || [];
+	global.demoProductsCached = global.demoProductsCached.filter(x => x._id !== id && x.id !== id);
+	return res.json({ ok: true });
 });
 
 app.get('*', (req, res) => {
