@@ -101,17 +101,22 @@ async function loadProducts(q = '', cat = '', page = 1, append = false) {
       grid.appendChild(sk);
     }
   }
-  const res = await fetchProducts(q, cat, page);
-  totalProducts = res.total || 0;
-  currentPage = res.page || 1;
-  const products = res.products || [];
-  renderProducts(products, append);
+  try {
+    const res = await fetchProducts(q, cat, page);
+    totalProducts = res.total || 0;
+    currentPage = res.page || 1;
+    const products = res.products || [];
+    renderProducts(products, append);
 
-  const countEl = document.getElementById('productCount');
-  if (countEl) countEl.textContent = totalProducts + ' ta mahsulot';
+    const countEl = document.getElementById('productCount');
+    if (countEl) countEl.textContent = totalProducts + ' ta mahsulot';
 
-  const wrap = document.getElementById('loadMoreWrap');
-  if (wrap) wrap.style.display = (currentPage * LIMIT < totalProducts) ? 'block' : 'none';
+    const wrap = document.getElementById('loadMoreWrap');
+    if (wrap) wrap.style.display = (currentPage * LIMIT < totalProducts) ? 'block' : 'none';
+  } catch (err) {
+    console.error('Mahsulotlarni yuklashda xatolik:', err);
+    if (grid) grid.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><h3>Xatolik yuz berdi</h3><p>Sahifani qaytadan yuklang</p></div>';
+  }
 }
 
 // --- Init ---
@@ -164,6 +169,15 @@ document.addEventListener('DOMContentLoaded', () => {
     loginBtn.addEventListener('click', () => {
       const token = localStorage.getItem('token');
       location.href = token ? '/profile.html' : '/login.html';
+    });
+  }
+
+  // Hero button
+  const heroBtn = document.getElementById('heroBtn');
+  if (heroBtn) {
+    heroBtn.addEventListener('click', () => {
+      const sec = document.getElementById('productsSection');
+      if (sec) sec.scrollIntoView({ behavior: 'smooth' });
     });
   }
 });

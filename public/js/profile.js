@@ -30,8 +30,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         ordersList.innerHTML = `<table class="admin-table"><thead><tr><th>Buyurtma</th><th>Mahsulotlar</th><th>Jami</th><th>Holat</th></tr></thead><tbody>${orders.map(o => {
           const [label, cls] = statusMap[o.status] || ['Kutilmoqda', 'badge-accent'];
           const count = (o.items || []).reduce((s, i) => s + (i.qty || 1), 0);
-          return `<tr style="cursor:pointer" onclick="location.href='/buyer.html?id=${o._id || o.id}'"><td><strong>#${(o._id || o.id || '').slice(-6)}</strong></td><td>${count} ta mahsulot</td><td>${formatPrice(o.total)}</td><td><span class="badge ${cls}">${label}</span></td></tr>`;
+          return `<tr style="cursor:pointer" data-href="/buyer.html?id=${o._id || o.id}"><td><strong>#${(o._id || o.id || '').slice(-6)}</strong></td><td>${count} ta mahsulot</td><td>${formatPrice(o.total)}</td><td><span class="badge ${cls}">${label}</span></td></tr>`;
         }).join('')}</tbody></table>`;
+        ordersList.querySelectorAll('tr[data-href]').forEach(tr => tr.addEventListener('click', () => location.href = tr.dataset.href));
       }
     } else ordersList.innerHTML = '<p style="color:var(--text-muted)">Buyurtmalarni yuklashda xatolik</p>';
   } catch (e) { ordersList.innerHTML = '<p style="color:var(--text-muted)">Tarmoq xatosi</p>'; }
