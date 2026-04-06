@@ -195,6 +195,7 @@ app.get('/api/products/:id', async (req, res) => {
 });
 
 app.post('/api/auth/register', async (req, res) => {
+  try {
 	const { username, password, email } = req.body;
 	if (!username || !password) return res.status(400).json({ error: 'username and password required' });
 	if (dbConnected) {
@@ -208,22 +209,31 @@ app.post('/api/auth/register', async (req, res) => {
 		const token = jwt.sign({ id: username, username, isAdmin: username === 'admin' }, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '7d' });
 		return res.json({ token, user: { id: username, username, email, isAdmin: username === 'admin' } });
 	}
+  } catch (err) {
+	console.error('Register error:', err.message);
+	res.status(500).json({ error: 'Server xatosi. Qaytadan urinib ko\'ring.' });
+  }
 });
 
 app.post('/api/auth/login', async (req, res) => {
+  try {
 	const { username, password } = req.body;
 	if (!username || !password) return res.status(400).json({ error: 'username and password required' });
 	if (dbConnected) {
 		const user = await User.findOne({ username });
-		if (!user) return res.status(401).json({ error: 'Invalid' });
+		if (!user) return res.status(401).json({ error: 'Foydalanuvchi topilmadi' });
 		const ok = await bcrypt.compare(password, user.password || '');
-		if (!ok) return res.status(401).json({ error: 'Invalid' });
+		if (!ok) return res.status(401).json({ error: 'Parol noto\'g\'ri' });
 		const token = jwt.sign({ id: user._id, username: user.username, isAdmin: user.isAdmin }, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '7d' });
 		return res.json({ token, user: { id: user._id, username: user.username, email: user.email, isAdmin: user.isAdmin } });
 	} else {
 		const token = jwt.sign({ id: username, username, isAdmin: username === 'admin' }, process.env.JWT_SECRET || 'dev-secret', { expiresIn: '7d' });
 		return res.json({ token, user: { id: username, username, email: `${username}@example.com`, isAdmin: username === 'admin' } });
 	}
+  } catch (err) {
+	console.error('Login error:', err.message);
+	res.status(500).json({ error: 'Server xatosi. Qaytadan urinib ko\'ring.' });
+  }
 });
 
 app.get('/api/profile', verifyToken, async (req, res) => {

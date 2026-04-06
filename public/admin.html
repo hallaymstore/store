@@ -7,43 +7,105 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .admin-login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); padding: 24px; }
+    .admin-login-card { background: var(--bg-white); border-radius: var(--radius-lg); padding: 40px; width: 100%; max-width: 400px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-light); text-align: center; }
+    .admin-login-card .admin-logo { width: 56px; height: 56px; background: var(--bg-hero); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+    .admin-login-card .admin-logo svg { color: #fff; }
+    .admin-login-card h1 { font-size: 22px; margin-bottom: 4px; }
+    .admin-login-card .subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+    .admin-login-card .error-msg { color: var(--red); font-size: 13px; margin-top: 12px; display: none; }
+    .admin-panel-wrap { display: none; }
+    .admin-mobile-header { display: none; background: #1e293b; color: #fff; padding: 12px 16px; align-items: center; justify-content: space-between; }
+    .admin-mobile-header .logo { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .admin-mobile-header .menu-btn { background: none; border: none; color: #fff; cursor: pointer; padding: 4px; }
+    .admin-sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 300; }
+    @media (max-width: 1024px) {
+      .admin-mobile-header { display: flex; }
+      .admin-sidebar { position: fixed; left: -260px; top: 0; bottom: 0; width: 240px; z-index: 400; transition: left .3s ease; }
+      .admin-sidebar.open { left: 0; }
+      .admin-sidebar-overlay.open { display: block; }
+    }
+  </style>
 </head>
 <body>
-  <div class="admin-layout">
-    <aside class="admin-sidebar">
-      <div class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Admin Panel</div>
-      <nav class="admin-nav">
-        <a href="/admin.html" class="active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0022 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Mahsulotlar</a>
-        <a href="/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Do'konga qaytish</a>
-        <a href="/profile.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profil</a>
-      </nav>
-    </aside>
-    <main class="admin-main">
-      <div class="stats-grid" id="statsGrid">
-        <div class="stat-card"><div class="stat-value" id="statProducts">0</div><div class="stat-label">Mahsulotlar</div></div>
-        <div class="stat-card"><div class="stat-value" id="statCategories">0</div><div class="stat-label">Kategoriyalar</div></div>
-      </div>
 
-      <div class="admin-card">
-        <h2 style="font-size:18px;margin-bottom:16px">Yangi mahsulot qo'shish</h2>
-        <form id="productForm">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div class="form-group"><label>Nomi</label><input name="title" required placeholder="Mahsulot nomi"></div>
-            <div class="form-group"><label>Narxi (so'm)</label><input name="price" type="number" required placeholder="100000"></div>
-            <div class="form-group"><label>Eski narxi</label><input name="oldPrice" type="number" placeholder="Ixtiyoriy"></div>
-            <div class="form-group"><label>Kategoriya</label><input name="category" placeholder="electronics, fashion..."></div>
-          </div>
-          <div class="form-group"><label>Tavsif</label><textarea name="description" rows="3" placeholder="Mahsulot haqida"></textarea></div>
-          <div class="form-group"><label>Rasm</label><input type="file" name="image" accept="image/*"></div>
-          <button type="submit" class="btn-primary">Mahsulot yaratish</button>
-        </form>
+  <!-- ADMIN LOGIN -->
+  <div class="admin-login-page" id="adminLoginPage">
+    <div class="admin-login-card">
+      <div class="admin-logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       </div>
+      <h1>Admin Panel</h1>
+      <p class="subtitle">Boshqaruv paneliga kirish</p>
+      <form id="adminLoginForm">
+        <div class="form-group">
+          <label>Foydalanuvchi nomi</label>
+          <input name="username" required placeholder="Username" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>Parol</label>
+          <input name="password" type="password" required placeholder="Parol" autocomplete="current-password">
+        </div>
+        <button class="btn-primary" type="submit" style="width:100%;padding:12px;font-size:15px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Kirish
+        </button>
+        <p class="error-msg" id="loginError"></p>
+      </form>
+      <p style="margin-top:16px;font-size:13px;color:var(--text-muted)"><a href="/" style="color:var(--accent)">Bosh sahifaga qaytish</a></p>
+    </div>
+  </div>
 
-      <div class="admin-card">
-        <h2 style="font-size:18px;margin-bottom:16px">Barcha mahsulotlar</h2>
-        <div id="adminProducts"><div class="skeleton" style="height:200px;border-radius:8px"></div></div>
+  <!-- ADMIN PANEL (hidden until auth) -->
+  <div class="admin-panel-wrap" id="adminPanelWrap">
+    <div class="admin-mobile-header" id="adminMobileHeader">
+      <div class="logo">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Admin Panel
       </div>
-    </main>
+      <button class="menu-btn" id="menuToggleBtn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="admin-sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="admin-layout">
+      <aside class="admin-sidebar" id="adminSidebar">
+        <div class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Admin Panel</div>
+        <nav class="admin-nav">
+          <a href="/admin.html" class="active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0022 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Mahsulotlar</a>
+          <a href="/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Do'konga qaytish</a>
+          <a href="/profile.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profil</a>
+          <a href="#" id="adminLogoutBtn" style="margin-top:16px;color:rgba(255,255,255,.5)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Chiqish</a>
+        </nav>
+      </aside>
+      <main class="admin-main">
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card"><div class="stat-value" id="statProducts">0</div><div class="stat-label">Mahsulotlar</div></div>
+          <div class="stat-card"><div class="stat-value" id="statCategories">0</div><div class="stat-label">Kategoriyalar</div></div>
+        </div>
+
+        <div class="admin-card">
+          <h2 style="font-size:18px;margin-bottom:16px">Yangi mahsulot qo'shish</h2>
+          <form id="productForm">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="form-group"><label>Nomi</label><input name="title" required placeholder="Mahsulot nomi"></div>
+              <div class="form-group"><label>Narxi (so'm)</label><input name="price" type="number" required placeholder="100000"></div>
+              <div class="form-group"><label>Eski narxi</label><input name="oldPrice" type="number" placeholder="Ixtiyoriy"></div>
+              <div class="form-group"><label>Kategoriya</label><input name="category" placeholder="electronics, fashion..."></div>
+            </div>
+            <div class="form-group"><label>Tavsif</label><textarea name="description" rows="3" placeholder="Mahsulot haqida"></textarea></div>
+            <div class="form-group"><label>Rasm</label><input type="file" name="image" accept="image/*"></div>
+            <button type="submit" class="btn-primary">Mahsulot yaratish</button>
+          </form>
+        </div>
+
+        <div class="admin-card">
+          <h2 style="font-size:18px;margin-bottom:16px">Barcha mahsulotlar</h2>
+          <div id="adminProducts"><div class="skeleton" style="height:200px;border-radius:8px"></div></div>
+        </div>
+      </main>
+    </div>
   </div>
 
   <div class="toast-container" id="toastContainer"></div>
